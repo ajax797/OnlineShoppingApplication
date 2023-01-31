@@ -75,7 +75,7 @@ public class BaseClass
 		String userUsername = fLib.getPropertyValue("Uusername");
 		String userPassword = fLib.getPropertyValue("Upassword");
 		UserLoginPage ulp = new UserLoginPage(driver);
-		ulp.loginAsUser(userUsername, userPassword);
+		ulp.loginAsNewUser(userUsername, userPassword);
 		
 		
 	}
