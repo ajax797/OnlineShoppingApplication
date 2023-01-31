@@ -5,6 +5,7 @@ import static org.testng.Assert.fail;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.poi.EncryptedDocumentException;
@@ -21,12 +22,6 @@ import objectRepo_Admin.CategoryPage;
 import objectRepo_Admin.InsertProductPage;
 import objectRepo_Admin.ManageProductPage;
 import objectRepo_Admin.SubCategoryPage;
-import objectRepo_Admin.TodaysOrderPage;
-import objectRepo_Admin.UpdateOrderPage;
-import objectRepo_User.MyCartPage;
-import objectRepo_User.PaymentPage;
-import objectRepo_User.UserHomePage;
-import objectRepo_User.UserLoginPage;
 
 @Listeners(com.ecomm.OSA.genericUtilities.ListenersImplementationClass.class)
 public class Editing_product extends BaseClass
@@ -47,8 +42,22 @@ public class Editing_product extends BaseClass
 		String categorydescription = eLib.readDataFromExcel("CatTestdata", 1, 1);
 		CategoryPage cp = new CategoryPage(driver);
 		cp.createCategory(categoryName, categorydescription);
+		ahp.getSubCategory().click();
+		SubCategoryPage scp = new SubCategoryPage(driver);
+		List<WebElement> catOptions = wLib.getOptionsOfDropdown(scp.getCategoryDropdown());
+		String actualResult=null;
+		for (WebElement catOption : catOptions) 
+		{
+			if(catOption.getText().equals(categoryName))
+			{
+				actualResult = catOption.getText();
+				break;
+			}
+		}
+		assertEquals(categoryName, actualResult);
+		
 	}
-	@Test(dependsOnMethods = "createCategory")
+	@Test(dependsOnMethods = "createCategory",groups = {"Admin","smoke"})
 	public void createSubcategory() throws InterruptedException, EncryptedDocumentException, IOException
 	{
 		AdminHomePage ahp = new AdminHomePage(driver);
@@ -56,8 +65,21 @@ public class Editing_product extends BaseClass
 		subcategoryName = eLib.readDataFromExcel("SubTestdata", 0, 1)+rand;
 		SubCategoryPage scp = new SubCategoryPage(driver);
 		scp.createSubcategory(subcategoryName, categoryName);
+		ahp.getInsertProduct().click();
+		InsertProductPage ip = new InsertProductPage(driver);
+		List<WebElement> subcatOptions = wLib.getOptionsOfDropdown(ip.getSubcategoryDropdown());
+		String actualResult=null;
+		for (WebElement subcatOption : subcatOptions) 
+		{
+			if(subcatOption.getText().equals(categoryName))
+			{
+				actualResult = subcatOption.getText();
+				break;
+			}
+		}
+		assertEquals(subcategoryName, actualResult);
 	}
-	@Test(dependsOnMethods = "createSubcategory")
+	@Test(dependsOnMethods = "createSubcategory",groups = {"Admin","smoke"})
 	public void insert_Product() throws EncryptedDocumentException, IOException, InterruptedException
 	{
 		AdminHomePage ahp = new AdminHomePage(driver);
@@ -73,7 +95,7 @@ public class Editing_product extends BaseClass
 		
 	}
 	
-	@Test(dependsOnMethods = "createProduct",groups = {"Admin","smoke"})
+	@Test(dependsOnMethods = "insert_Product",groups = {"Admin","smoke"})
 	public void editProduct()
 	{
 		AdminHomePage ahp = new AdminHomePage(driver);
@@ -100,145 +122,4 @@ public class Editing_product extends BaseClass
 		assertEquals(ActualResult, expectedresult);
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	@Test(dependsOnMethods = "editProduct",groups = "User")
-	public void placeOrder()
-	{
-		wLib.waitForPageLaod(driver);
-		UserHomePage uhp = new UserHomePage(driver);
-		uhp.getSearchTextfield().sendKeys(Uexpectedresult);
-		uhp.getSearchButton().click();
-		driver.findElement(By.xpath("//a[.='"+Uexpectedresult+"']")).click();
-		uhp.getAddToCart().click();
-		try
-		{
-		wLib.acceptAlert(driver);
-		}
-		catch(Exception e)
-		{
-			System.out.println("Alert handled");
-		}
-		uhp.getMyCart().click();
-		MyCartPage mcp = new MyCartPage(driver);
-		mcp.getProceedToCheckout().click();
-		PaymentPage pp = new PaymentPage(driver);
-		pp.getcODOption().click();
-		pp.getSubmitButton().click();
-		System.out.println("Order for "+Uexpectedresult+" has been successfully placed");
-	}
-	
-	@Test(dependsOnMethods = "placeOrder",groups = {"Admin","smoke","regression"})
-	public void manageOrder() throws InterruptedException
-	{
-		wLib.waitForPageLaod(driver);
-		AdminHomePage ahp = new AdminHomePage(driver);
-		ahp.getTodaysOrder().click();
-		TodaysOrderPage top = new TodaysOrderPage(driver);
-		wLib.select("100", top.getEntryNumber());
-		for(;;)
-		{
-			try 
-			{
-				driver.findElement(By.xpath("//td[.='"+Uexpectedresult+"']/..//a")).click();
-				break;
-			}
-			catch (Exception e) 
-			{
-				top.getNextIcon().click();
-				
-			}
-		}
-		String parenttab = driver.getWindowHandle();
-		wLib.switchToWindow(driver, "updateorder");
-		UpdateOrderPage uo = new UpdateOrderPage(driver);
-		uo.updateOrderToProgress();
-		wLib.acceptAlert(driver);
-		driver.switchTo().window(parenttab);
-		ahp.getPendingOrder().click();
-		top.getEntryNumber();
-		wLib.select("100", top.getEntryNumber());
-		for(;;)
-		{
-			try 
-			{
-				driver.findElement(By.xpath("//td[.='"+Uexpectedresult+"']/..//a")).click();
-				break;
-			}
-			catch (Exception e) 
-			{
-				top.getNextIcon().click();
-				
-			}
-		}
-		String parenttab1 = driver.getWindowHandle();
-		wLib.switchToWindow(driver, "updateorder");
-		uo.updateOrderToDelivered();
-		wLib.acceptAlert(driver);
-		driver.switchTo().window(parenttab1);
-		ahp.getDeliveredOrder().click();
-		String actualresult;
-		wLib.select("100", top.getEntryNumber());
-		for(;;)
-		{
-			try 
-			{
-				actualresult = driver.findElement(By.xpath("//td[.='"+Uexpectedresult+"']")).getText();
-				break;
-			}
-			catch (Exception e) 
-			{
-				top.getNextIcon().click();
-			}
-		}
-		assertEquals(actualresult, Uexpectedresult);
-		
-	}
-	
-	@Test
-	public void login_logInfo() throws InterruptedException, IOException
-	{
-		rand=jLib.getRandomNum();
-		String userUrl = fLib.getPropertyValue("Uurl");
-		driver.get(userUrl);
-		UserHomePage uhp = new UserHomePage(driver);
-		uhp.getLogin().click();
-		HashMap<String, String> newuser = eLib.getList("NewUser", 0, 1);
-		UserLoginPage ulp = new UserLoginPage(driver);
-		HashMap<String, String> credentials = ulp.createUser(driver, newuser, rand);
-		String username = credentials.get("Username");
-		String password = credentials.get("Password");
-		wLib.acceptAlert(driver);
-		uhp.getLogin().click();
-		ulp.loginAsUser(username, password);
-		uhp.getLogout().click();
-		loginApp();
-		AdminHomePage ahp = new AdminHomePage(driver);
-		ahp.getUserLoginInfo().click();
-		driver.findElement(By.xpath("//input")).sendKeys(username,Keys.BACK_SPACE);
-		String actualResult="";
-		WebElement listcount = driver.findElement(By.xpath("//select[@size='1']"));
-		TodaysOrderPage top = new TodaysOrderPage(driver);
-		wLib.select("100", listcount);
-		for(;;)
-		{
-			try 
-			{
-				actualResult = driver.findElement(By.xpath("//td[.='"+username+"']")).getText();
-				break;
-			}
-			catch (Exception e) 
-			{
-				top.getNextIcon().click();
-			}
-		}
-		assertEquals(actualResult, username);
-	}
-
 }

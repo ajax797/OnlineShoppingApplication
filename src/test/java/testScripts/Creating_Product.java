@@ -24,7 +24,6 @@ import objectRepo_Admin.SubCategoryPage;
 @Listeners(com.ecomm.OSA.genericUtilities.ListenersImplementationClass.class)
 public class Creating_Product extends BaseClass
 {
-	/////
 	String categoryName;
 	String subcategoryName;
 	String expectedresult;

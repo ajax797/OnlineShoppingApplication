@@ -5,10 +5,12 @@ import static org.testng.Assert.fail;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 import org.testng.annotations.Test;
 
 import com.ecomm.OSA.genericUtilities.BaseClass;
@@ -31,6 +33,7 @@ public class Manage_Order extends BaseClass
 	String Uexpectedresult;
 	HashMap<String, String> productDetails;
 	public int rand;
+	
 	@Test(groups = {"Admin","smoke"}, retryAnalyzer = com.ecomm.OSA.genericUtilities.RetryAnalyzerImplementationClass.class )
 	public void createCategory() throws IOException, InterruptedException
 	{
@@ -41,7 +44,22 @@ public class Manage_Order extends BaseClass
 		String categorydescription = eLib.readDataFromExcel("CatTestdata", 1, 1);
 		CategoryPage cp = new CategoryPage(driver);
 		cp.createCategory(categoryName, categorydescription);
+		ahp.getSubCategory().click();
+		SubCategoryPage scp = new SubCategoryPage(driver);
+		List<WebElement> catOptions = wLib.getOptionsOfDropdown(scp.getCategoryDropdown());
+		String actualResult=null;
+		for (WebElement catOption : catOptions) 
+		{
+			if(catOption.getText().equals(categoryName))
+			{
+				actualResult = catOption.getText();
+				break;
+			}
+		}
+		assertEquals(categoryName, actualResult);
+		
 	}
+	
 	@Test(dependsOnMethods = "createCategory",groups = {"Admin","smoke"})
 	public void createSubcategory() throws InterruptedException, EncryptedDocumentException, IOException
 	{
@@ -50,7 +68,21 @@ public class Manage_Order extends BaseClass
 		subcategoryName = eLib.readDataFromExcel("SubTestdata", 0, 1)+rand;
 		SubCategoryPage scp = new SubCategoryPage(driver);
 		scp.createSubcategory(subcategoryName, categoryName);
+		ahp.getInsertProduct().click();
+		InsertProductPage ip = new InsertProductPage(driver);
+		List<WebElement> subcatOptions = wLib.getOptionsOfDropdown(ip.getSubcategoryDropdown());
+		String actualResult=null;
+		for (WebElement subcatOption : subcatOptions) 
+		{
+			if(subcatOption.getText().equals(categoryName))
+			{
+				actualResult = subcatOption.getText();
+				break;
+			}
+		}
+		assertEquals(subcategoryName, actualResult);
 	}
+	
 	@Test(dependsOnMethods = "createSubcategory",groups = {"Admin","smoke"})
 	public void insert_Product() throws EncryptedDocumentException, IOException, InterruptedException
 	{
@@ -63,9 +95,9 @@ public class Manage_Order extends BaseClass
 		fail();
 		driver.findElement(By.xpath("//input")).sendKeys(expectedresult,Keys.ENTER);
 		String ActualResult = driver.findElement(By.xpath("//td[text() ='"+expectedresult+"']")).getText();
-		assertEquals(ActualResult, expectedresult);
-		
+		assertEquals(ActualResult, expectedresult);	
 	}
+	
 	@Test(dependsOnMethods = "insert_Product",groups = {"User","smoke"})
 	public void placeOrder()
 	{
@@ -91,6 +123,7 @@ public class Manage_Order extends BaseClass
 		pp.getSubmitButton().click();
 		System.out.println("Order for "+expectedresult+" has been successfully placed");
 	}
+	
 	@Test(dependsOnMethods = "placeOrder",groups = {"Admin","smoke"})
 	public void updateToPending() throws InterruptedException
 	{
@@ -118,6 +151,24 @@ public class Manage_Order extends BaseClass
 		uo.updateOrderToProgress();
 		wLib.acceptAlert(driver);
 		driver.switchTo().window(parenttab);
+		ahp.getPendingOrder().click();
+		String actualresult;
+		top.getEntryNumber();
+		wLib.select("100", top.getEntryNumber());
+		for(;;)
+		{
+			try 
+			{
+				actualresult=driver.findElement(By.xpath("//td[.='"+expectedresult+"']/..//a")).getText();
+				break;
+			}
+			catch (Exception e) 
+			{
+				top.getNextIcon().click();
+				
+			}
+		}
+		assertEquals(actualresult,expectedresult);
 	}
 		
 	@Test(dependsOnMethods = "updateToPending",groups = {"Admin","smoke"})
@@ -162,9 +213,6 @@ public class Manage_Order extends BaseClass
 				top.getNextIcon().click();
 			}
 		}
-		assertEquals(actualresult,expectedresult);
-		
+		assertEquals(actualresult,expectedresult);	
 	}
-	
-
 }

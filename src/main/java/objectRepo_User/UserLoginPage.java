@@ -89,7 +89,7 @@ public class UserLoginPage
 		return submitButton;
 	}
 	
-	public void loginAsUser(String userUsername,String userPassword)
+	public void loginAsNewUser(String userUsername,String userPassword)
 	{
 		getEmailText().sendKeys(userUsername);
 		getPasswordText().sendKeys(userPassword);
