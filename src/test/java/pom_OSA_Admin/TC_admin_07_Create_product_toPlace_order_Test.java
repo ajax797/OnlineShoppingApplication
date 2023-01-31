@@ -64,7 +64,7 @@ public class TC_admin_07_Create_product_toPlace_order_Test {
 		UserHomePage uhp = new UserHomePage(driver);
 		uhp.getLogin().click();
 		UserLoginPage ulp = new UserLoginPage(driver);
-		ulp.loginAsUser(userUsername, userPassword);
+		ulp.loginAsNewUser(userUsername, userPassword);
 		uhp.getSearchTextfield().sendKeys(expectedresult);
 		uhp.getSearchButton().click();
 		driver.findElement(By.xpath("//a[.='"+expectedresult+"']")).click();

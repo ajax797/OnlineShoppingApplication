@@ -195,7 +195,7 @@ public class Admin_Module extends BaseClass
 		String password = credentials.get("Password");
 		wLib.acceptAlert(driver);
 		uhp.getLogin().click();
-		ulp.loginAsUser(username, password);
+		ulp.loginAsNewUser(username, password);
 		uhp.getLogout().click();
 		loginApp();
 		AdminHomePage ahp = new AdminHomePage(driver);

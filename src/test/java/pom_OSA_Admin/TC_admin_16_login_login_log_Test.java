@@ -46,7 +46,7 @@ public class TC_admin_16_login_login_log_Test {
 		String password = credentials.get("Password");
 		wLib.acceptAlert(driver);
 		uhp.getLogin().click();
-		ulp.loginAsUser(username, password);
+		ulp.loginAsNewUser(username, password);
 		uhp.getLogout().click();
 		driver.get(adminUrl);
 		AdminLoginPage alp = new AdminLoginPage(driver);
