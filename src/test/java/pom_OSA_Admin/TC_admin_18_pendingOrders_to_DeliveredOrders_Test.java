@@ -41,7 +41,6 @@ public class TC_admin_18_pendingOrders_to_DeliveredOrders_Test {
 		String userUsername = fLib.getPropertyValue("Uusername");
 		String userPassword = fLib.getPropertyValue("Upassword");
 		
-		System.setProperty("webdriver", "./chromedriver.exe");
 		WebDriver driver=new ChromeDriver();
 		driver.get(adminUrl);
 		wLib.waitForPageLaod(driver);

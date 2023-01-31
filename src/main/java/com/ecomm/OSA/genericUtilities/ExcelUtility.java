@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -36,7 +37,15 @@ public class ExcelUtility extends JavaUtility
 	
 	public void writeDataIntoExcel(String sheetName, int rowNm, int cellNm, String data) throws EncryptedDocumentException, IOException
 	{
-		wb.getSheet(sheetName).createRow(rowNm).createCell(cellNm).setCellValue(data);
+		Row row = wb.getSheet(sheetName).getRow(rowNm);
+		if(row==null)
+		{
+			row=wb.getSheet(sheetName).createRow(rowNm);
+		}
+		row.createCell(cellNm).setCellValue(data);
+		
+		
+		
 		FileOutputStream fout=new FileOutputStream(IPathConstants.excelPath);
 		wb.write(fout);
 	}

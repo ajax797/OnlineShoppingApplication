@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -57,6 +58,12 @@ public class WebdriverUtility extends JavaUtility
 	{
 		Select sel = new Select(element);
 		sel.selectByVisibleText(visibleText);
+	}
+	public List<WebElement> getOptionsOfDropdown(WebElement element) throws InterruptedException
+	{
+		Select sel = new Select(element);
+		List<WebElement> options = sel.getOptions();
+		return options;
 	}
 	
 	public void mousehover(WebDriver driver, WebElement element)

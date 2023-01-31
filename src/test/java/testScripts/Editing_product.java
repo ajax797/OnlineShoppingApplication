@@ -1,4 +1,4 @@
-package testNG_OSA_Admin;
+package testScripts;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.apache.poi.EncryptedDocumentException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -28,26 +29,38 @@ import objectRepo_User.UserHomePage;
 import objectRepo_User.UserLoginPage;
 
 @Listeners(com.ecomm.OSA.genericUtilities.ListenersImplementationClass.class)
-public class Admin_Module extends BaseClass
+public class Editing_product extends BaseClass
 {
+	String categoryName;
+	String subcategoryName;
 	String expectedresult;
-	String Uexpectedresult;
+	public static String Uexpectedresult;
 	HashMap<String, String> productDetails;
 	public int rand;
 	@Test(groups = {"Admin","smoke"}, retryAnalyzer = com.ecomm.OSA.genericUtilities.RetryAnalyzerImplementationClass.class )
-	public void createProduct() throws IOException, InterruptedException
+	public void createCategory() throws IOException, InterruptedException
 	{
 		rand=jLib.getRandomNum();
 		AdminHomePage ahp = new AdminHomePage(driver);
 		ahp.getCreateCategory().click();
-		String categoryName = eLib.readDataFromExcel("CatTestdata", 0, 1)+rand;
+		categoryName = eLib.readDataFromExcel("CatTestdata", 0, 1)+rand;
 		String categorydescription = eLib.readDataFromExcel("CatTestdata", 1, 1);
 		CategoryPage cp = new CategoryPage(driver);
 		cp.createCategory(categoryName, categorydescription);
+	}
+	@Test(dependsOnMethods = "createCategory")
+	public void createSubcategory() throws InterruptedException, EncryptedDocumentException, IOException
+	{
+		AdminHomePage ahp = new AdminHomePage(driver);
 		ahp.getSubCategory().click();
-		String subcategoryName = eLib.readDataFromExcel("SubTestdata", 0, 1)+rand;
+		subcategoryName = eLib.readDataFromExcel("SubTestdata", 0, 1)+rand;
 		SubCategoryPage scp = new SubCategoryPage(driver);
 		scp.createSubcategory(subcategoryName, categoryName);
+	}
+	@Test(dependsOnMethods = "createSubcategory")
+	public void insert_Product() throws EncryptedDocumentException, IOException, InterruptedException
+	{
+		AdminHomePage ahp = new AdminHomePage(driver);
 		ahp.getInsertProduct().click();
 		productDetails = eLib.getList("ProductTestdata", 0, 1);
 		InsertProductPage ip = new InsertProductPage(driver);	
@@ -85,8 +98,16 @@ public class Admin_Module extends BaseClass
 		mpp.getSearchTextfield().sendKeys(Uexpectedresult);
 		String ActualResult = driver.findElement(By.xpath("//td[text() ='"+Uexpectedresult+"']")).getText();
 		assertEquals(ActualResult, expectedresult);
-		
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@Test(dependsOnMethods = "editProduct",groups = "User")
 	public void placeOrder()
 	{

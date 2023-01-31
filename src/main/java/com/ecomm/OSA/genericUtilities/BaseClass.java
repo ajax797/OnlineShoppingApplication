@@ -53,7 +53,7 @@ public class BaseClass
 		wLib.waitForPageLaod(driver);
 		
 	}
-	@BeforeMethod(onlyForGroups = "Admin",groups = "soke")
+	@BeforeMethod(onlyForGroups = "Admin",groups = "smoke")
 	public void loginApp() throws IOException
 	{
 		String adminUrl = fLib.getPropertyValue("Aurl");
